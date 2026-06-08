@@ -610,7 +610,7 @@ LUAOBJFILES =   $(LUAOBJFILES) $(OLUA)lbitlib.o
 # is https://github.com/wmcbrine/PDCurses.git
 #=================================================================
 
-!IF "$(ADD_CURSES)" == "Y"
+!IF "$(WANT_CURSES)" == "Y"
 PDCTXTFOLDER            = wincon
 #PDCTXTFOLDER            = vt
 PDCURSES_CURSES_H	= $(PDCURSES_TOP)curses.h
@@ -1616,7 +1616,7 @@ $(LUASRC)lua.h:
 #	git submodule update --remote $(SUBM)lua
 #
 #aka PDCDEP
-!IF "$(ADD_CURSES)" == "Y"
+!IF "$(WANT_CURSES)" == "Y"
 $(PDCURSES_TOP)curses.h:
 	git submodule init $(SUBM)$(R_PDCDIST)
 	git submodule update $(SUBM)$(R_PDCDIST)
@@ -1636,7 +1636,7 @@ $(LUASRC)lua.h:
 	curl -L $(CURLLUASRC) -o $(CURLLUADST)
 	tar -xvf $(CURLLUADST)
 	cd $(R_SRC)
-!IF "$(ADD_CURSES)" == "Y"
+!IF "$(WANT_CURSES)" == "Y"
 $(PDCURSES_TOP)curses.h:
 	@if not exist $(LIBDIR)*.* mkdir $(R_LIBDIR)
 	cd $(LIBDIR)
@@ -1644,11 +1644,11 @@ $(PDCURSES_TOP)curses.h:
 	if not exist $(PDCDIST)*.* mkdir $(R_PDCDIST)
 	tar -C $(R_PDCDIST) --strip-components=1 -xvf $(CURLPDCDST)
 	cd $(R_SRC)
-!ENDIF  # ADD_CURSES
+!ENDIF  # WANT_CURSES
 !ENDIF  # GIT_AVAILABLE
 !ELSE   # INTERNET_AVAILABLE
 $(LUASRC)lua.h:
-!IF "$(ADD_CURSES)" == "Y"
+!IF "$(WANT_CURSES)" == "Y"
 $(PDCURSES_TOP)curses.h:
 !ENDIF
 !ENDIF  # INTERNET_AVAILABLE
