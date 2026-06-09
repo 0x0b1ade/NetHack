@@ -21,18 +21,30 @@ add_cxflags(
     "-DCONFIG_ERROR_SECURE=FALSE",
     "-DSELF_RECOVER",
     "-DNOSTATICFN",
+    "-DCURSES_UNICODE",
     "-DCURSES_GRAPHICS",
     "-D_DEFAULT_SOURCE",
-    "-D_XOPEN_SOURCE=600"
+    "-D_XOPEN_SOURCE=600",
+    "-include hack.h",
+    "-Wno-deprecated-declarations",
+    "-Wno-implicit-function-declaration",
+    "-Wno-missing-field-initializers",
+    "-Wno-implicit-int"
 )
-add_cxflags("-Wno-deprecated-declarations", "-Wno-missing-field-initializers")
 
 if is_plat("linux") then
     add_includedirs("sys/unix")
     add_ldflags("-rdynamic")
-elseif is_plat("windows") then
-    set_toolchains("mingw")
+elseif is_plat("windows") or is_plat("mingw") then
+    -- 如果要使用 mingw，只配置 set_toolchains("mingw") 即可
+    -- 仅 set_toolchains 不 set_plat 是不好的，只用于生成数据库就无所谓了
+    -- 如果要使用 LLVM，则同时需要 set_plat("mingw"), set_toolchains("llvm")
+    -- 不然可能索引错误
+    set_plat("mingw")
+    set_toolchains("llvm")
+    -- set_toolchains("mingw")
     add_includedirs("sys/windows")
+    add_includedirs("lib/pdcursesmod")
     add_includedirs("submodules/pdcursesmod")
     add_cxflags(
         "-D_CONSOLE",
@@ -41,7 +53,8 @@ elseif is_plat("windows") then
         "-D_CRT_NONSTDC_NO_DEPRECATE",
         "-DHAS_STDINT_H",
         "-DPDC_WIDE",
-        "-DPDC_RGB"
+        "-DPDC_RGB",
+        "-include curses.h"
     )
 end
 
@@ -61,7 +74,7 @@ target("nethack")
         add_files("sys/share/unixtty.c")
         add_files("win/tty/termcap.c")
         add_links("m", "dl", "uuid", "ncursesw", "tinfo")
-    elseif is_plat("windows") then
+    elseif is_plat("windows") or is_plat("mingw") then
         add_files("sys/windows/windmain.c")
         add_files("sys/windows/windsys.c")
         add_files("sys/windows/win10.c")
