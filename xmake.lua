@@ -2,7 +2,7 @@
 -- Only for generating compile_commands.json
 
 set_languages("c99")
-set_warnings("all", "extra", "pedantic")
+set_warnings("allextra", "pedantic")
 
 add_includedirs("include")
 add_includedirs("sys/share")
@@ -81,15 +81,3 @@ target("nethack")
         add_files("sys/windows/consoletty.c")
         add_links("kernel32", "user32", "advapi32", "winmm", "bcrypt")
     end
-
-task("nh")
-    set_menu {
-        usage = "xmake nh",
-        description = "完整构建并安装 NetHack (tty + curses, shared install)",
-    }
-    on_run(function ()
-        os.exec("make clean")
-        os.exec("make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 WANT_SHARED_INSTALL=1 all")
-        os.exec("make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 WANT_SHARED_INSTALL=1 install")
-        os.exec("make clean")
-    end)
