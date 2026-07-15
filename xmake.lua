@@ -11,51 +11,60 @@ add_includedirs("win/curses")
 add_includedirs("win/share")
 add_includedirs("submodules/lua")
 
-add_cxflags(
-    "-DNOTPARMDECL",
-    "-DDLB",
-    "-DSYSCF",
-    "-DSECURE",
-    "-DTIMED_DELAY",
-    "-DDUMPLOG",
-    "-DCONFIG_ERROR_SECURE=FALSE",
-    "-DSELF_RECOVER",
-    "-DNOSTATICFN",
-    "-DCURSES_UNICODE",
-    "-DCURSES_GRAPHICS",
-    "-D_DEFAULT_SOURCE",
-    "-D_XOPEN_SOURCE=600",
-    "-include hack.h",
-    "-Wno-deprecated-declarations",
-    "-Wno-implicit-function-declaration",
-    "-Wno-missing-field-initializers",
-    "-Wno-implicit-int"
+add_defines(
+    "NOTPARMDECL",
+    "DLB",
+    "SYSCF",
+    "SECURE",
+    "TIMED_DELAY",
+    "DUMPLOG",
+    "CONFIG_ERROR_SECURE=FALSE",
+    "SELF_RECOVER",
+    "NOSTATICFN",
+    "CURSES_UNICODE",
+    "CURSES_GRAPHICS",
+    "_DEFAULT_SOURCE",
+    "_XOPEN_SOURCE=600"
 )
+
+add_forceincludes("hack.h")
+
+if is_plat("windows") then
+    add_cxflags(
+        "/TC",
+        "/wd4996",
+        "/wd4013",
+        "/wd4431"
+    )
+else
+    add_cxflags(
+        "-Wno-deprecated-declarations",
+        "-Wno-implicit-function-declaration",
+        "-Wno-missing-field-initializers",
+        "-Wno-implicit-int"
+    )
+end
 
 if is_plat("linux") then
     add_includedirs("sys/unix")
     add_ldflags("-rdynamic")
 elseif is_plat("windows") or is_plat("mingw") then
-    -- 如果要使用 mingw，只配置 set_toolchains("mingw") 即可
-    -- 仅 set_toolchains 不 set_plat 是不好的，只用于生成数据库就无所谓了
-    -- 如果要使用 LLVM，则同时需要 set_plat("mingw"), set_toolchains("llvm")
-    -- 不然可能索引错误
-    set_plat("mingw")
-    set_toolchains("llvm")
-    -- set_toolchains("mingw")
+    if is_plat("mingw") then
+        set_toolchains("clang")
+    end
     add_includedirs("sys/windows")
     add_includedirs("lib/pdcursesmod")
     add_includedirs("submodules/pdcursesmod")
-    add_cxflags(
-        "-D_CONSOLE",
-        "-DWIN32CON",
-        "-D_CRT_SECURE_NO_DEPRECATE",
-        "-D_CRT_NONSTDC_NO_DEPRECATE",
-        "-DHAS_STDINT_H",
-        "-DPDC_WIDE",
-        "-DPDC_RGB",
-        "-include curses.h"
+    add_defines(
+        "_CONSOLE",
+        "WIN32CON",
+        "_CRT_SECURE_NO_DEPRECATE",
+        "_CRT_NONSTDC_NO_DEPRECATE",
+        "HAS_STDINT_H",
+        "PDC_WIDE",
+        "PDC_RGB"
     )
+    add_forceincludes("curses.h")
 end
 
 target("nethack")
