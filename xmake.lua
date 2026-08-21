@@ -1,6 +1,4 @@
--- 仅用于生成 compile_commands.json
--- Only for generating compile_commands.json
-
+set_project("nethack")
 set_languages("c99")
 set_warnings("allextra", "pedantic")
 
@@ -90,3 +88,54 @@ target("nethack")
         add_files("sys/windows/consoletty.c")
         add_links("kernel32", "user32", "advapi32", "winmm", "bcrypt")
     end
+
+task("nhsetup")
+    set_menu {
+        usage = "xmake nhsetup",
+        description = "Initialize submodules and generate native Makefiles",
+    }
+    on_run(function ()
+        if is_host("windows") then
+            print("Initializing submodules...")
+            os.exec("git submodule update --init submodules/lua submodules/pdcursesmod")
+            print("Running nhsetup.bat...")
+            os.exec(path.join("sys", "windows", "nhsetup.bat"))
+        elseif is_host("linux") then
+            print("Running setup.sh...")
+            os.exec("sh sys/unix/setup.sh hints/linux.500")
+            print("Fetching Lua...")
+            os.exec("make fetch-lua")
+        end
+    end)
+
+task("nhbuild")
+    set_menu {
+        usage = "xmake nhbuild",
+        description = "Build NetHack (tty + curses) via native toolchain",
+    }
+    on_run(function ()
+        if is_host("windows") then
+            print("Building with nmake (tty + curses)...")
+            local old = os.cd("src")
+            os.exec("nmake")
+            os.cd(old)
+        elseif is_host("linux") then
+            print("Building with make...")
+            os.exec("make -j$(nproc)")
+        end
+    end)
+
+task("nhclean")
+    set_menu {
+        usage = "xmake nhclean",
+        description = "Clean build artifacts via native toolchain",
+    }
+    on_run(function ()
+        if is_host("windows") then
+            local old = os.cd("src")
+            os.exec("nmake clean")
+            os.cd(old)
+        elseif is_host("linux") then
+            os.exec("make clean")
+        end
+    end)
