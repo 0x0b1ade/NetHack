@@ -86,6 +86,7 @@ target("nethack")
         add_files("sys/windows/windsys.c")
         add_files("sys/windows/win10.c")
         add_files("sys/windows/consoletty.c")
+        add_files("win/win32/*.c")
         add_links("kernel32", "user32", "advapi32", "winmm", "bcrypt")
     end
 
