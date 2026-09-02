@@ -102,7 +102,7 @@ task("nhsetup")
             os.exec(path.join("sys", "windows", "nhsetup.bat"))
         elseif is_host("linux") then
             print("Running setup.sh...")
-            os.exec("sh sys/unix/setup.sh hints/linux.500")
+            os.exec("sh sys/unix/setup.sh sys/unix/hints/linux.500")
             print("Fetching Lua...")
             os.exec("make fetch-lua")
         end
@@ -121,7 +121,7 @@ task("nhbuild")
             os.cd(old)
         elseif is_host("linux") then
             print("Building with make...")
-            os.exec("make -j$(nproc)")
+            os.exec("make -j$(nproc) WANT_WIN_CURSES=1 WANT_DEFAULT=curses")
         end
     end)
 
